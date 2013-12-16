@@ -213,10 +213,10 @@
         if (page.is_link) {
           $item = $('<a href="#">');
           $item.attr('data-page', page.number);
-          $item.on('click', (function(that) {
+          $item.on('click', (function(pagination) {
             return function(e) {
               e.preventDefault();
-              return that.show_page(parseInt($(this).attr('data-page')));
+              return pagination.show_page(parseInt($(this).attr('data-page')));
             };
           })(this));
         } else {

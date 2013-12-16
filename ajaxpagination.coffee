@@ -154,10 +154,10 @@ class root.Pagination
                 $item.attr('data-page', page.number)
                 $item.on(
                     'click',
-                    do (that=@) ->
+                    do (pagination=@) ->
                          (e) ->
                              e.preventDefault()
-                             that.show_page(parseInt($(@).attr('data-page')))
+                             pagination.show_page(parseInt($(@).attr('data-page')))
                 )
             else
                 $item = $('<span>')
