@@ -195,5 +195,6 @@ $.extend(
                                    show_page_callback,
                                    items_by_page,
                                    total_items,
-                                   pagination_visible_pages))
+                                   pagination_visible_pages)
+)
 
