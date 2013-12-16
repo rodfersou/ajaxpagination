@@ -81,7 +81,7 @@
       this.show_page_callback = show_page_callback != null ? show_page_callback : function() {};
       this.items_by_page = items_by_page != null ? items_by_page : 1;
       this.total_items = total_items != null ? total_items : 100;
-      this.pagination_visible_pages = pagination_visible_pages != null ? pagination_visible_pages : 11;
+      this.pagination_visible_pages = pagination_visible_pages != null ? pagination_visible_pages : 9;
       this.current_page = this.total_items > 0 ? 1 : 0;
       this.first_item = this.total_items > 0 ? 1 : 0;
       this.last_item = this.total_items;

@@ -51,7 +51,7 @@ class root.Pagination
                   @show_page_callback      =()->,
                   @items_by_page           =1,
                   @total_items             =100,
-                  @pagination_visible_pages=11) ->
+                  @pagination_visible_pages=9) ->
         @current_page = if @total_items > 0 then 1 else 0
         @first_item = if @total_items > 0 then 1 else 0
         @last_item = @total_items
