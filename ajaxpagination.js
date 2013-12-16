@@ -265,4 +265,25 @@
 
   })();
 
+  $.extend($.fn, {
+    ajaxpagination: function(fetch_url, show_page_callback, items_by_page, total_items, pagination_visible_pages) {
+      if (fetch_url == null) {
+        fetch_url = '';
+      }
+      if (show_page_callback == null) {
+        show_page_callback = function() {};
+      }
+      if (items_by_page == null) {
+        items_by_page = 1;
+      }
+      if (total_items == null) {
+        total_items = 100;
+      }
+      if (pagination_visible_pages == null) {
+        pagination_visible_pages = 9;
+      }
+      return new root.Pagination('#' + $(this).attr('id'), fetch_url, show_page_callback, items_by_page, total_items, pagination_visible_pages);
+    }
+  });
+
 }).call(this);

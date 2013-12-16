@@ -182,3 +182,18 @@ class root.Pagination
         page = new root.Page(@, page_number)
         page.show()
         @update_pagination(page_number)
+
+$.extend(
+    $.fn,
+    ajaxpagination: (fetch_url               ='',
+                     show_page_callback      =()->,
+                     items_by_page           =1,
+                     total_items             =100,
+                     pagination_visible_pages=9)->
+        return new root.Pagination('#'+$(this).attr('id'),
+                                   fetch_url,
+                                   show_page_callback,
+                                   items_by_page,
+                                   total_items,
+                                   pagination_visible_pages))
+
