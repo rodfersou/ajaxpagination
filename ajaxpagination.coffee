@@ -56,7 +56,7 @@ class root.Pagination
         @first_item = if @total_items > 0 then 1 else 0
         @last_item = @total_items
         @first_page = if @total_items > 0 then 1 else 0
-        @total_pages = Math.round(@total_items / @items_by_page)
+        @total_pages = Math.ceil(@total_items / @items_by_page)
         @last_page = @total_pages
         @page_instances = {}
         @show_page(@first_item)
@@ -107,7 +107,7 @@ class root.Pagination
             else
                 pagination_visible.push(item)
         if (@total_pages <= pagination_visible_pages)
-            for i in [@first_page..pagination_visible_pages]
+            for i in [@first_page..@total_pages]
                 new root.Page(@, i)
                 add_page(i)
         else # total_items > pagination_visible_pages

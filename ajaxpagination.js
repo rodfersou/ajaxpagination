@@ -86,14 +86,14 @@
       this.first_item = this.total_items > 0 ? 1 : 0;
       this.last_item = this.total_items;
       this.first_page = this.total_items > 0 ? 1 : 0;
-      this.total_pages = Math.round(this.total_items / this.items_by_page);
+      this.total_pages = Math.ceil(this.total_items / this.items_by_page);
       this.last_page = this.total_pages;
       this.page_instances = {};
       this.show_page(this.first_item);
     }
 
     Pagination.prototype.pagination_items = function(current_page) {
-      var add_page, i, pagination_visible, pagination_visible_pages, _i, _j, _k, _l, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
+      var add_page, i, pagination_visible, pagination_visible_pages, _i, _j, _k, _l, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7;
       pagination_visible_pages = this.pagination_visible_pages - 2;
       pagination_visible = [];
       add_page = function(i, type, position) {
@@ -154,27 +154,27 @@
         }
       };
       if (this.total_pages <= pagination_visible_pages) {
-        for (i = _i = _ref = this.first_page; _ref <= pagination_visible_pages ? _i <= pagination_visible_pages : _i >= pagination_visible_pages; i = _ref <= pagination_visible_pages ? ++_i : --_i) {
+        for (i = _i = _ref = this.first_page, _ref1 = this.total_pages; _ref <= _ref1 ? _i <= _ref1 : _i >= _ref1; i = _ref <= _ref1 ? ++_i : --_i) {
           new root.Page(this, i);
           add_page(i);
         }
       } else {
         if (current_page <= pagination_visible_pages - 3) {
-          for (i = _j = _ref1 = this.first_page, _ref2 = pagination_visible_pages - 2; _ref1 <= _ref2 ? _j <= _ref2 : _j >= _ref2; i = _ref1 <= _ref2 ? ++_j : --_j) {
+          for (i = _j = _ref2 = this.first_page, _ref3 = pagination_visible_pages - 2; _ref2 <= _ref3 ? _j <= _ref3 : _j >= _ref3; i = _ref2 <= _ref3 ? ++_j : --_j) {
             new root.Page(this, i);
             add_page(i);
           }
           add_page(0, 'dots');
           add_page(this.last_page);
         } else if (current_page >= (this.total_pages - (pagination_visible_pages - 4))) {
-          for (i = _k = _ref3 = this.total_pages - (pagination_visible_pages - 3), _ref4 = this.total_pages; _ref3 <= _ref4 ? _k <= _ref4 : _k >= _ref4; i = _ref3 <= _ref4 ? ++_k : --_k) {
+          for (i = _k = _ref4 = this.total_pages - (pagination_visible_pages - 3), _ref5 = this.total_pages; _ref4 <= _ref5 ? _k <= _ref5 : _k >= _ref5; i = _ref4 <= _ref5 ? ++_k : --_k) {
             new root.Page(this, i);
             add_page(i);
           }
           add_page(0, 'dots', 0);
           add_page(this.first_page, 'page', 0);
         } else {
-          for (i = _l = _ref5 = current_page - (Math.floor(pagination_visible_pages / 2) - 2), _ref6 = current_page + (Math.floor(pagination_visible_pages / 2) - 2); _ref5 <= _ref6 ? _l <= _ref6 : _l >= _ref6; i = _ref5 <= _ref6 ? ++_l : --_l) {
+          for (i = _l = _ref6 = current_page - (Math.floor(pagination_visible_pages / 2) - 2), _ref7 = current_page + (Math.floor(pagination_visible_pages / 2) - 2); _ref6 <= _ref7 ? _l <= _ref7 : _l >= _ref7; i = _ref6 <= _ref7 ? ++_l : --_l) {
             new root.Page(this, i);
             add_page(i);
           }
