@@ -78,17 +78,17 @@ root.Pagination = (pagination_id,
             if (@fetch_url != '')
                 if ($.zepto?)
                     $.ajax
-                        url: @fetch_url
-                        type: 'GET'
-                        dataType: 'json'
-                        data: data
+                        url       : @fetch_url
+                        type      : 'GET'
+                        dataType  : 'json'
+                        data      : data
                         'complete': callback
                 else # jquery fallback
                     $.ajax
-                        url: @fetch_url
-                        type: 'GET'
+                        url     : @fetch_url
+                        type    : 'GET'
                         dataType: 'json'
-                        data: data
+                        data    : data
                     .done(callback)
             else
                 callback()
