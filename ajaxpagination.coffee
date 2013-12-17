@@ -18,9 +18,10 @@ root.Page = (parent, page_number)->
                     @show_after_fetch = true
         fetch: ->
             @parent.ajax(
-                'start': @start
-                'stop' : @stop
-                'size' : @size
+                'start' : @start
+                'stop'  : @stop
+                'size'  : @size
+                'filter': @parent.filter_text
                 do (page=@)->
                     (data)->
                         page.items = data
@@ -43,10 +44,13 @@ root.Pagination = (pagination_id,
                       @show_page_callback,
                       @items_by_page,
                       @total_items,
-                      @visible_pages) ->
-            @page_instances = {}
+                      @visible_pages,
+                      @filter_text='') ->
+            @page_instances      = {}
+            @filtered_pagination = null
             @ajax(
                 'info': true
+                'filter': @filter_text
                 do (pagination=@)->
                     (data)->
                         if (data['ITEMS_BY_PAGE']?)
@@ -193,10 +197,20 @@ root.Pagination = (pagination_id,
                 $item.addClass(page.class)
                 $item.html(page.content)
                 $li.html($item)
-        # moves
         show_page: (page_number) ->
             page = new root.Page(@, page_number)
             page.show()
+        filter: (filter_text)->
+            if (filter_text == '')
+                @show_page(@current_page)
+            else
+                @filtered_pagination = new Pagination(@pagination_id,
+                                                      @fetch_url,
+                                                      @show_page_callback,
+                                                      @items_by_page,
+                                                      @total_items,
+                                                      @visible_pages,
+                                                      filter_text)
 
     root.Pagination.instance ?= {}
     root.Pagination.instance[pagination_id] ?= new Pagination(pagination_id,

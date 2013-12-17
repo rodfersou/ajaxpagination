@@ -31,7 +31,8 @@
         return this.parent.ajax({
           'start': this.start,
           'stop': this.stop,
-          'size': this.size
+          'size': this.size,
+          'filter': this.parent.filter_text
         }, (function(page) {
           return function(data) {
             page.items = data;
@@ -70,16 +71,19 @@
       visible_pages = 9;
     }
     Pagination = (function() {
-      function Pagination(pagination_id, fetch_url, show_page_callback, items_by_page, total_items, visible_pages) {
+      function Pagination(pagination_id, fetch_url, show_page_callback, items_by_page, total_items, visible_pages, filter_text) {
         this.pagination_id = pagination_id;
         this.fetch_url = fetch_url;
         this.show_page_callback = show_page_callback;
         this.items_by_page = items_by_page;
         this.total_items = total_items;
         this.visible_pages = visible_pages;
+        this.filter_text = filter_text != null ? filter_text : '';
         this.page_instances = {};
+        this.filtered_pagination = null;
         this.ajax({
-          'info': true
+          'info': true,
+          'filter': this.filter_text
         }, (function(pagination) {
           return function(data) {
             if ((data['ITEMS_BY_PAGE'] != null)) {
@@ -272,6 +276,14 @@
         var page;
         page = new root.Page(this, page_number);
         return page.show();
+      };
+
+      Pagination.prototype.filter = function(filter_text) {
+        if (filter_text === '') {
+          return this.show_page(this.current_page);
+        } else {
+          return this.filtered_pagination = new Pagination(this.pagination_id, this.fetch_url, this.show_page_callback, this.items_by_page, this.total_items, this.visible_pages, filter_text);
+        }
       };
 
       return Pagination;
