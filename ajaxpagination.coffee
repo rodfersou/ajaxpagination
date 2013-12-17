@@ -1,7 +1,7 @@
 root = exports ? this
 
 root.Page = (parent, page_number)->
-    class _Singleton
+    class Page
         constructor: (@parent, @page_number)->
             @items            = null
             @start            = (@page_number - 1) * @parent.items_by_page
@@ -28,7 +28,7 @@ root.Page = (parent, page_number)->
                             page.show_after_fetch = false
                             page.show(page)
             )
-    parent.page_instances[page_number] ?= new _Singleton(parent, page_number)
+    parent.page_instances[page_number] ?= new Page(parent, page_number)
     return parent.page_instances[page_number]
 
 root.Pagination = (pagination_id,
@@ -37,7 +37,7 @@ root.Pagination = (pagination_id,
                    items_by_page     =1,
                    total_items       =100,
                    visible_pages     =9) ->
-    class _Singleton
+    class Pagination
         constructor: (@pagination_id,
                       @fetch_url,
                       @show_page_callback,
@@ -139,26 +139,32 @@ root.Pagination = (pagination_id,
                         new root.Page(@, i)
                         add_page(i)
                     add_page(0, 'dots')
+                    new root.Page(@, @last_page)
                     add_page(@last_page)
                 else if (current_page >= (@total_pages - (visible_pages - 4)))
                     for i in [(@total_pages - (visible_pages - 3))..@total_pages]
                         new root.Page(@, i)
                         add_page(i)
                     add_page(0, 'dots', 0)
+                    new root.Page(@, @first_page)
                     add_page(@first_page, 'page', 0)
                 else # we are in the middle
                     for i in [(current_page - (Math.floor(visible_pages / 2) - 2))..(current_page + (Math.floor(visible_pages / 2) - 2))]
                         new root.Page(@, i)
                         add_page(i)
                     add_page(0, 'dots', 0)
+                    new root.Page(@, @first_page)
                     add_page(@first_page, 'page', 0)
                     add_page(0, 'dots')
+                    new root.Page(@, @last_page)
                     add_page(@last_page)
             if (current_page > @first_page)
+                new root.Page(@, current_page - 1)
                 add_page(current_page - 1, 'prev', 0)
             else
                 add_page(0, 'prev_disabled', 0)
             if (current_page < @last_page)
+                new root.Page(@, current_page + 1)
                 add_page(current_page + 1, 'next')
             else
                 add_page(0, 'next_disabled')
@@ -193,7 +199,7 @@ root.Pagination = (pagination_id,
             page.show()
 
     root.Pagination.instance ?= {}
-    root.Pagination.instance[pagination_id] ?= new _Singleton(pagination_id,
+    root.Pagination.instance[pagination_id] ?= new Pagination(pagination_id,
                                                               fetch_url,
                                                               show_page_callback,
                                                               items_by_page,
@@ -208,10 +214,13 @@ $.extend(
                      items_by_page     =1,
                      total_items       =100,
                      visible_pages     =9)->
-        return new root.Pagination('#'+$(this).attr('id'),
-                                   fetch_url,
-                                   show_page_callback,
-                                   items_by_page,
-                                   total_items,
-                                   visible_pages)
+        paginations = (new root.Pagination('#'+$(el).attr('id'),
+                                           fetch_url,
+                                           show_page_callback,
+                                           items_by_page,
+                                           total_items,
+                                           visible_pages) for el in @)
+        if (paginations.length == 1)
+            paginations = paginations[0]
+        return paginations
 )

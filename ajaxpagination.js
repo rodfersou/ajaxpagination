@@ -5,9 +5,9 @@
   root = typeof exports !== "undefined" && exports !== null ? exports : this;
 
   root.Page = function(parent, page_number) {
-    var _Singleton, _base;
-    _Singleton = (function() {
-      function _Singleton(parent, page_number) {
+    var Page, _base;
+    Page = (function() {
+      function Page(parent, page_number) {
         this.parent = parent;
         this.page_number = page_number;
         this.items = null;
@@ -27,7 +27,7 @@
         };
       }
 
-      _Singleton.prototype.fetch = function() {
+      Page.prototype.fetch = function() {
         return this.parent.ajax({
           'start': this.start,
           'stop': this.stop,
@@ -43,17 +43,17 @@
         })(this));
       };
 
-      return _Singleton;
+      return Page;
 
     })();
     if ((_base = parent.page_instances)[page_number] == null) {
-      _base[page_number] = new _Singleton(parent, page_number);
+      _base[page_number] = new Page(parent, page_number);
     }
     return parent.page_instances[page_number];
   };
 
   root.Pagination = function(pagination_id, fetch_url, show_page_callback, items_by_page, total_items, visible_pages) {
-    var _Singleton, _base, _base1;
+    var Pagination, _base, _base1;
     if (fetch_url == null) {
       fetch_url = '';
     }
@@ -69,8 +69,8 @@
     if (visible_pages == null) {
       visible_pages = 9;
     }
-    _Singleton = (function() {
-      function _Singleton(pagination_id, fetch_url, show_page_callback, items_by_page, total_items, visible_pages) {
+    Pagination = (function() {
+      function Pagination(pagination_id, fetch_url, show_page_callback, items_by_page, total_items, visible_pages) {
         this.pagination_id = pagination_id;
         this.fetch_url = fetch_url;
         this.show_page_callback = show_page_callback;
@@ -96,7 +96,7 @@
         })(this));
       }
 
-      _Singleton.prototype.calc_pages = function() {
+      Pagination.prototype.calc_pages = function() {
         this.current_page = this.total_items > 0 ? 1 : 0;
         this.first_item = this.total_items > 0 ? 1 : 0;
         this.last_item = this.total_items;
@@ -106,7 +106,7 @@
         return this.show_page(this.first_item);
       };
 
-      _Singleton.prototype.ajax = function(data, callback) {
+      Pagination.prototype.ajax = function(data, callback) {
         if (($.zepto != null)) {
           return $.ajax({
             url: this.fetch_url,
@@ -125,7 +125,7 @@
         }
       };
 
-      _Singleton.prototype.pagination_items = function(current_page) {
+      Pagination.prototype.pagination_items = function(current_page) {
         var add_page, i, pagination_visible, _i, _j, _k, _l, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7;
         visible_pages = this.visible_pages - 2;
         pagination_visible = [];
@@ -198,6 +198,7 @@
               add_page(i);
             }
             add_page(0, 'dots');
+            new root.Page(this, this.last_page);
             add_page(this.last_page);
           } else if (current_page >= (this.total_pages - (visible_pages - 4))) {
             for (i = _k = _ref4 = this.total_pages - (visible_pages - 3), _ref5 = this.total_pages; _ref4 <= _ref5 ? _k <= _ref5 : _k >= _ref5; i = _ref4 <= _ref5 ? ++_k : --_k) {
@@ -205,6 +206,7 @@
               add_page(i);
             }
             add_page(0, 'dots', 0);
+            new root.Page(this, this.first_page);
             add_page(this.first_page, 'page', 0);
           } else {
             for (i = _l = _ref6 = current_page - (Math.floor(visible_pages / 2) - 2), _ref7 = current_page + (Math.floor(visible_pages / 2) - 2); _ref6 <= _ref7 ? _l <= _ref7 : _l >= _ref7; i = _ref6 <= _ref7 ? ++_l : --_l) {
@@ -212,17 +214,21 @@
               add_page(i);
             }
             add_page(0, 'dots', 0);
+            new root.Page(this, this.first_page);
             add_page(this.first_page, 'page', 0);
             add_page(0, 'dots');
+            new root.Page(this, this.last_page);
             add_page(this.last_page);
           }
         }
         if (current_page > this.first_page) {
+          new root.Page(this, current_page - 1);
           add_page(current_page - 1, 'prev', 0);
         } else {
           add_page(0, 'prev_disabled', 0);
         }
         if (current_page < this.last_page) {
+          new root.Page(this, current_page + 1);
           add_page(current_page + 1, 'next');
         } else {
           add_page(0, 'next_disabled');
@@ -230,7 +236,7 @@
         return pagination_visible;
       };
 
-      _Singleton.prototype.update_pagination = function(page_number) {
+      Pagination.prototype.update_pagination = function(page_number) {
         var $item, $li, $pagination, $ul, page, _i, _len, _ref, _results;
         $pagination = $(this.pagination_id);
         $pagination.html('');
@@ -262,26 +268,27 @@
         return _results;
       };
 
-      _Singleton.prototype.show_page = function(page_number) {
+      Pagination.prototype.show_page = function(page_number) {
         var page;
         page = new root.Page(this, page_number);
         return page.show();
       };
 
-      return _Singleton;
+      return Pagination;
 
     })();
     if ((_base = root.Pagination).instance == null) {
       _base.instance = {};
     }
     if ((_base1 = root.Pagination.instance)[pagination_id] == null) {
-      _base1[pagination_id] = new _Singleton(pagination_id, fetch_url, show_page_callback, items_by_page, total_items, visible_pages);
+      _base1[pagination_id] = new Pagination(pagination_id, fetch_url, show_page_callback, items_by_page, total_items, visible_pages);
     }
     return root.Pagination.instance[pagination_id];
   };
 
   $.extend($.fn, {
     ajaxpagination: function(fetch_url, show_page_callback, items_by_page, total_items, visible_pages) {
+      var el, paginations;
       if (fetch_url == null) {
         fetch_url = '';
       }
@@ -297,7 +304,19 @@
       if (visible_pages == null) {
         visible_pages = 9;
       }
-      return new root.Pagination('#' + $(this).attr('id'), fetch_url, show_page_callback, items_by_page, total_items, visible_pages);
+      paginations = (function() {
+        var _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = this.length; _i < _len; _i++) {
+          el = this[_i];
+          _results.push(new root.Pagination('#' + $(el).attr('id'), fetch_url, show_page_callback, items_by_page, total_items, visible_pages));
+        }
+        return _results;
+      }).call(this);
+      if (paginations.length === 1) {
+        paginations = paginations[0];
+      }
+      return paginations;
     }
   });
 
