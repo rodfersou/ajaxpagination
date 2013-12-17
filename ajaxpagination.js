@@ -17,7 +17,7 @@
         this.show_after_fetch = false;
         this.fetch();
         this.show = function() {
-          if ((this.items != null)) {
+          if ((this.parent.fetch_url === "") || (this.items != null)) {
             this.parent.show_page_callback(this);
             this.parent.current_page = this.page_number;
             return this.parent.update_pagination(this.page_number);
@@ -86,14 +86,16 @@
           'filter': this.filter_text
         }, (function(pagination) {
           return function(data) {
-            if ((data['ITEMS_BY_PAGE'] != null)) {
-              pagination.items_by_page = parseInt(data['ITEMS_BY_PAGE']);
-            }
-            if ((data['TOTAL_ITEMS'] != null)) {
-              pagination.total_items = parseInt(data['TOTAL_ITEMS']);
-            }
-            if ((data['VISIBLE_PAGES'] != null)) {
-              pagination.visible_pages = parseInt(data['VISIBLE_PAGES']);
+            if ((data != null)) {
+              if ((data['ITEMS_BY_PAGE'] != null)) {
+                pagination.items_by_page = parseInt(data['ITEMS_BY_PAGE']);
+              }
+              if ((data['TOTAL_ITEMS'] != null)) {
+                pagination.total_items = parseInt(data['TOTAL_ITEMS']);
+              }
+              if ((data['VISIBLE_PAGES'] != null)) {
+                pagination.visible_pages = parseInt(data['VISIBLE_PAGES']);
+              }
             }
             return pagination.calc_pages();
           };
@@ -111,21 +113,25 @@
       };
 
       Pagination.prototype.ajax = function(data, callback) {
-        if (($.zepto != null)) {
-          return $.ajax({
-            url: this.fetch_url,
-            type: 'GET',
-            dataType: 'json',
-            data: data,
-            'complete': callback
-          });
+        if (this.fetch_url !== '') {
+          if (($.zepto != null)) {
+            return $.ajax({
+              url: this.fetch_url,
+              type: 'GET',
+              dataType: 'json',
+              data: data,
+              'complete': callback
+            });
+          } else {
+            return $.ajax({
+              url: this.fetch_url,
+              type: 'GET',
+              dataType: 'json',
+              data: data
+            }).done(callback);
+          }
         } else {
-          return $.ajax({
-            url: this.fetch_url,
-            type: 'GET',
-            dataType: 'json',
-            data: data
-          }).done(callback);
+          return callback();
         }
       };
 
@@ -196,7 +202,7 @@
             add_page(i);
           }
         } else {
-          if (current_page <= visible_pages - 3) {
+          if (current_page <= (Math.floor(visible_pages / 2) + 1)) {
             for (i = _j = _ref2 = this.first_page, _ref3 = visible_pages - 2; _ref2 <= _ref3 ? _j <= _ref3 : _j >= _ref3; i = _ref2 <= _ref3 ? ++_j : --_j) {
               new root.Page(this, i);
               add_page(i);
@@ -204,7 +210,7 @@
             add_page(0, 'dots');
             new root.Page(this, this.last_page);
             add_page(this.last_page);
-          } else if (current_page >= (this.total_pages - (visible_pages - 4))) {
+          } else if (current_page > (this.total_pages - (Math.floor(visible_pages / 2) + 1))) {
             for (i = _k = _ref4 = this.total_pages - (visible_pages - 3), _ref5 = this.total_pages; _ref4 <= _ref5 ? _k <= _ref5 : _k >= _ref5; i = _ref4 <= _ref5 ? ++_k : --_k) {
               new root.Page(this, i);
               add_page(i);
@@ -270,6 +276,34 @@
           _results.push($li.html($item));
         }
         return _results;
+      };
+
+      Pagination.prototype.show_first = function() {
+        return this.show_page(this.first_page);
+      };
+
+      Pagination.prototype.show_last = function() {
+        return this.show_page(this.last_page);
+      };
+
+      Pagination.prototype.has_prev = function() {
+        return this.current_page > this.first_page;
+      };
+
+      Pagination.prototype.has_next = function() {
+        return this.current_page < this.last_page;
+      };
+
+      Pagination.prototype.show_prev = function() {
+        if (this.has_prev()) {
+          return this.show_page(this.current_page - 1);
+        }
+      };
+
+      Pagination.prototype.show_next = function() {
+        if (this.has_next()) {
+          return this.show_page(this.current_page + 1);
+        }
       };
 
       Pagination.prototype.show_page = function(page_number) {

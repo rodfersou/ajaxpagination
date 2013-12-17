@@ -10,7 +10,8 @@ root.Page = (parent, page_number)->
             @show_after_fetch = false
             @fetch()
             @show = ()->
-                if (@items?)
+                if (@parent.fetch_url == "") or
+                   (@items?)
                     @parent.show_page_callback(@)
                     @parent.current_page = @page_number
                     @parent.update_pagination(@page_number)
@@ -53,12 +54,13 @@ root.Pagination = (pagination_id,
                 'filter': @filter_text
                 do (pagination=@)->
                     (data)->
-                        if (data['ITEMS_BY_PAGE']?)
-                            pagination.items_by_page = parseInt(data['ITEMS_BY_PAGE'])
-                        if (data['TOTAL_ITEMS']?)
-                            pagination.total_items = parseInt(data['TOTAL_ITEMS'])
-                        if (data['VISIBLE_PAGES']?)
-                            pagination.visible_pages = parseInt(data['VISIBLE_PAGES'])
+                        if (data?)
+                            if (data['ITEMS_BY_PAGE']?)
+                                pagination.items_by_page = parseInt(data['ITEMS_BY_PAGE'])
+                            if (data['TOTAL_ITEMS']?)
+                                pagination.total_items = parseInt(data['TOTAL_ITEMS'])
+                            if (data['VISIBLE_PAGES']?)
+                                pagination.visible_pages = parseInt(data['VISIBLE_PAGES'])
                         pagination.calc_pages()
             )
      
@@ -73,20 +75,23 @@ root.Pagination = (pagination_id,
      
         ajax: (data,
                callback)->
-            if ($.zepto?)
-                $.ajax
-                    url: @fetch_url
-                    type: 'GET'
-                    dataType: 'json'
-                    data: data
-                    'complete': callback
-            else # jquery fallback
-                $.ajax
-                    url: @fetch_url
-                    type: 'GET'
-                    dataType: 'json'
-                    data: data
-                .done(callback)
+            if (@fetch_url != '')
+                if ($.zepto?)
+                    $.ajax
+                        url: @fetch_url
+                        type: 'GET'
+                        dataType: 'json'
+                        data: data
+                        'complete': callback
+                else # jquery fallback
+                    $.ajax
+                        url: @fetch_url
+                        type: 'GET'
+                        dataType: 'json'
+                        data: data
+                    .done(callback)
+            else
+                callback()
      
         # update pagination html
         pagination_items: (current_page) ->
@@ -138,14 +143,14 @@ root.Pagination = (pagination_id,
                     new root.Page(@, i)
                     add_page(i)
             else # total_items > visible_pages
-                if (current_page <= visible_pages - 3)
+                if (current_page <= (Math.floor(visible_pages / 2) + 1))
                     for i in [@first_page..visible_pages - 2]
                         new root.Page(@, i)
                         add_page(i)
                     add_page(0, 'dots')
                     new root.Page(@, @last_page)
                     add_page(@last_page)
-                else if (current_page >= (@total_pages - (visible_pages - 4)))
+                else if (current_page > (@total_pages - (Math.floor(visible_pages / 2) + 1)))
                     for i in [(@total_pages - (visible_pages - 3))..@total_pages]
                         new root.Page(@, i)
                         add_page(i)
@@ -197,7 +202,21 @@ root.Pagination = (pagination_id,
                 $item.addClass(page.class)
                 $item.html(page.content)
                 $li.html($item)
-        show_page: (page_number) ->
+        show_first: ()->
+            @show_page(@first_page)
+        show_last: ()->
+            @show_page(@last_page)
+        has_prev: ()->
+            return (@current_page > @first_page)
+        has_next: ()->
+            return (@current_page < @last_page)
+        show_prev: ()->
+            if (@has_prev())
+                @show_page(@current_page - 1)
+        show_next: ()->
+            if (@has_next())
+                @show_page(@current_page + 1)
+        show_page: (page_number)->
             page = new root.Page(@, page_number)
             page.show()
         filter: (filter_text)->
